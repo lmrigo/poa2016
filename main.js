@@ -1,12 +1,12 @@
-var app = angular.module('codecraft', [
-	'ngResource',
-	'infinite-scroll',
-	'angularSpinner',
-	'jcs-autoValidate',
-	'angular-ladda',
-	'mgcrea.ngStrap',
-	'toaster',
-	'ngAnimate',
+var app = angular.module('poa2016', [
+//	'ngResource',
+//	'infinite-scroll',
+//	'angularSpinner',
+//	'jcs-autoValidate',
+//	'angular-ladda',
+//	'mgcrea.ngStrap',
+//	'toaster',
+//	'ngAnimate',
 	'ui.router'
 ]);
 
@@ -47,16 +47,8 @@ app.config(function ($stateProvider, $urlRouterProvider) {
 	$urlRouterProvider.otherwise('/');
 });
 
-app.config(function ($httpProvider, $resourceProvider, laddaProvider, $datepickerProvider) {
-	$httpProvider.defaults.headers.common['Authorization'] = 'Token a4a945e5de9a7ac28044337e25d3d2252fc0e6e4';
-	$resourceProvider.defaults.stripTrailingSlashes = false;
-	laddaProvider.setOption({
-		style: 'expand-right'
-	});
-	angular.extend($datepickerProvider.defaults, {
-		dateFormat: 'd/M/yyyy',
-		autoclose: true
-	});
+app.config(function ($httpProvider) {
+	
 });
 
 app.filter('defaultImage', function () {
@@ -68,17 +60,8 @@ app.filter('defaultImage', function () {
 	}
 });
 
-app.factory("Contact", function ($resource) {
-	return $resource("https://codecraftpro.com/api/samples/v1/contact/:id/", {id: '@id'}, {
-		update: {
-			method: 'PUT'
-		}
-	});
-});
-
 app.directive('ccSpinner', function () {
 	return {
-		// 'transclude': true,
 		'restrict': 'AE',
 		'templateUrl': 'templates/spinner.html',
 		'scope': {
@@ -93,16 +76,15 @@ app.directive('ccCard', function () {
 		'templateUrl': 'templates/card.html',
 		'scope': {
 			'user': '='
-			// ,'deleteUser': '&'
 		},
 		'controller' : function ($scope, ContactService) {
-			$scope.isDeleting = false
-			$scope.deleteUser = function () {
-				$scope.isDeleting = true
-				ContactService.removeContact($scope.user).then(function () {
-					$scope.isDeleting = false
-				})
-			}
+			// $scope.isDeleting = false
+			// $scope.deleteUser = function () {
+			// 	$scope.isDeleting = true
+			// 	ContactService.removeContact($scope.user).then(function () {
+			// 		$scope.isDeleting = false
+			// 	})
+			// }
 		}
 	}
 })
@@ -114,18 +96,18 @@ app.controller('PersonDetailController', function ($scope, $stateParams, $state,
 	$scope.contacts.selectedPerson = $scope.contacts.getPerson($stateParams.email);
 
 
-	$scope.save = function () {
-		$scope.contacts.updateContact($scope.contacts.selectedPerson).then(function () {
-			$state.go("list");
-		});
+	// $scope.save = function () {
+	// 	$scope.contacts.updateContact($scope.contacts.selectedPerson).then(function () {
+	// 		$state.go("list");
+	// 	});
 
-	};
+	// };
 
-	$scope.remove = function () {
-		$scope.contacts.removeContact($scope.contacts.selectedPerson).then(function () {
-			$state.go("list");
-		});
-	}
+	// $scope.remove = function () {
+	// 	$scope.contacts.removeContact($scope.contacts.selectedPerson).then(function () {
+	// 		$state.go("list");
+	// 	});
+	// }
 });
 
 app.controller('PersonCreateController', function ($scope, $state, ContactService) {
@@ -133,16 +115,16 @@ app.controller('PersonCreateController', function ($scope, $state, ContactServic
 
 	$scope.contacts = ContactService;
 
-	$scope.save = function () {
-		console.log("createContact");
-		$scope.contacts.createContact($scope.contacts.selectedPerson)
-			.then(function () {
-				$state.go("list");
-			})
-	};
+	// $scope.save = function () {
+	// 	console.log("createContact");
+	// 	$scope.contacts.createContact($scope.contacts.selectedPerson)
+	// 		.then(function () {
+	// 			$state.go("list");
+	// 		})
+	// };
 });
 
-app.controller('PersonListController', function ($scope, $modal, ContactService) {
+app.controller('PersonListController', function ($scope, ContactService) {
 
 	$scope.search = "";
 	$scope.order = "email";
@@ -150,26 +132,12 @@ app.controller('PersonListController', function ($scope, $modal, ContactService)
 
 	$scope.loadMore = function () {
 		console.log("Load More!!!");
-		$scope.contacts.loadMore();
+		// $scope.contacts.loadMore();
 	};
-
-/*  //deleted code
-	$scope.parentDeleteUser = function (user) {
-		$scope.contacts.removeContact(user)
-	}
-
-	$scope.showCreateModal = function () {
-		$scope.contacts.selectedPerson = {};
-		$scope.createModal = $modal({
-			scope: $scope,
-			template: 'templates/modal.create.tpl.html',
-			show: true
-		})
-	};*/
 
 });
 
-app.service('ContactService', function (Contact, $rootScope, $q, toaster) {
+app.service('ContactService', function ($rootScope) {
 
 
 	var self = {
@@ -204,27 +172,55 @@ app.service('ContactService', function (Contact, $rootScope, $q, toaster) {
 			self.loadContacts();
 		},
 		'loadContacts': function () {
-			if (self.hasMore && !self.isLoading) {
-				self.isLoading = true;
-
-				var params = {
-					'page': self.page,
-					'search': self.search,
-					'ordering': self.ordering
-				};
-
-				Contact.get(params, function (data) {
-					console.log(data);
-					angular.forEach(data.results, function (person) {
-						self.persons.push(new Contact(person));
-					});
-
-					if (!data.next) {
-						self.hasMore = false;
-					}
-					self.isLoading = false;
+			$.getJSON( "data/candidatos.json", function( data ) {
+			  //console.log(data)
+			  angular.forEach(data.candidatos, function (cand) {
+			  	//console.log(cand)
+			  	var person = {
+			  		'photo': cand.fotoUrl,
+			  		'name': cand.nome,
+			  		'sex': cand.descricaoSexo,
+			  		'city': cand.localCandidatura,
+			  		'country': 'Brasil',
+			  		'birthdate': cand.dataDeNascimento,
+			  		'position': cand.cargo.nome,
+			  		'party': {
+			  			'number': cand.partido.numero,
+			  			'name': cand.partido.nome,
+			  			'acronym': cand.partido.sigla
+			  		},
+			  		'id': cand.id,
+			  		'site': cand.sites,
+			  		'coalition': cand.nomeColigacao,
+			  		'votingname': cand.nomeUrna,
+			  		'fullname': cand.nomeCompleto,
+			  		'number': cand.numero
+			  	}
+			  	//console.log(person)
+					self.persons.push(person);
 				});
-			}
+			});
+			// if (self.hasMore && !self.isLoading) {
+			// 	self.isLoading = true;
+
+			// 	var params = {
+			// 		'page': self.page,
+			// 		'search': self.search,
+			// 		'ordering': self.ordering
+			// 	};
+
+			// 	Contact.get(params, function (data) {
+			// 		console.log(data);
+			// 		angular.forEach(data.results, function (person) {
+			// 			self.persons.push(new Contact(person));
+			// 		});
+
+			// 		if (!data.next) {
+			// 			self.hasMore = false;
+			// 		}
+			// 		self.isLoading = false;
+			// 	});
+			// }
 
 		},
 		'loadMore': function () {
@@ -292,7 +288,7 @@ app.service('ContactService', function (Contact, $rootScope, $q, toaster) {
 	};
 
 	self.loadContacts();
-	self.watchFilters();
+//	self.watchFilters();
 
 	return self;
 

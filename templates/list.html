@@ -1,0 +1,19 @@
+<div class="col-md-12" >
+
+	<div class="row"
+   infinite-scroll="loadMore()"
+   infinite-scroll-immediate-check="false"
+   infinite-scroll-distance="1">
+		<cc-card ng-repeat="person in contacts.persons" user="person" delete-user="parentDeleteUser"></cc-card>
+	</div>
+
+	<div ng-show="contacts.persons.length == 0 && !contacts.isLoading" >
+		<div class="alert alert-info" >
+			<p class="text-center" >Não foram encontrados resultados para o termo de busca: <i>{{ contacts.search }}</i></p >
+		</div >
+	</div >
+
+	<cc-spinner is-loading="contacts.isLoading" message="Mooing...">
+	</cc-spinner>
+
+</div >
