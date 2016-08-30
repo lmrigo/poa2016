@@ -1,25 +1,27 @@
-<div class="col-md-6" >
+<div class="col-md-6 card" >
   <div class="well well-sm" >
     <div class="row" >
       <div class="col-md-4" >
-        <img ng-src="{{ user.photo }}"
+        <img ng-src="{{ user.photo | defaultImage:'./avatar.png' }}"
              alt=""
              class="img-rounded img-responsive" />
       </div >
       <div class="col-md-8" >
-        <h4 >{{ user.name }}
-          <i class="fa"
-             ng-class="{'fa-female':user.sex == 'F', 'fa-male': user.sex == 'M'}" ></i >
+        <h4 >
+          {{ user.votingname }}
         </h4 >
-        <small >{{ user.city }}, {{ user.country }}
-          <i class="fa fa-map-marker" ></i >
-        </small >
+        <i>{{ user.fullname }}</i>
         <p >
-          <i class="fa fa-envelope-o" ></i >
-          {{ user.email }}
+          <small >
+            <i class="fa fa-users" ></i >
+            {{ user.position }}
+          </small>
           <br />
-          <i class="fa fa-gift" ></i >
-          {{ user.birthdate | date:"longDate"}}
+          <i class="fa fa-slack" ></i >
+          {{ user.number }}
+          <br />
+          <i class="fa fa-flag" ></i >
+          {{ user.party.acronym }} {{ user.coalition === user.party.acronym ? '' : '(' + user.coalition + ')'}}
         </p >
 
 <!--         <button type="button" class="btn btn-default btn-sm" ui-sref="edit({email:user.email})">
